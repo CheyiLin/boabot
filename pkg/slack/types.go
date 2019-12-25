@@ -1,13 +1,13 @@
 package slack
 
-// SlashCmdResponseType* reperesnt response enum types
-const (
-	SlashCmdResponseTypeDefault = "ephemeral"
-	SlashCmdResponseTypeChannel = "in_channel"
+import (
+	slackApi "github.com/nlopes/slack"
 )
 
-// SlashCmdResponse represents a response of slack's slash command
-type SlashCmdResponse struct {
-	ResponseType string `json:"response_type"`
-	Text         string `json:"text"`
+// NewSlashResponse returns a new slack response message
+func NewSlashResponse(text string) *slackApi.Msg {
+	return &slackApi.Msg{
+		ResponseType: slackApi.ResponseTypeInChannel,
+		Text:         text,
+	}
 }

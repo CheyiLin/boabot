@@ -27,10 +27,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := &slack.SlashCmdResponse{
-		ResponseType: slack.SlashCmdResponseTypeChannel,
-		Text:         boa.GetAnswer(),
-	}
+	resp := slack.NewSlashResponse(boa.GetAnswer())
 	jsonBs, err := json.Marshal(resp)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
