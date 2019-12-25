@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	defaultQuestion = "(藏在心裡的話)"
+	defaultQuestion = "(謎之音)"
 	defaultAnswer   = "順從你的心"
 )
 
