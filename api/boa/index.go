@@ -1,10 +1,12 @@
 package app
 
 import (
+	"net/http"
+
 	"github.com/cheyilin/boabot/pkg/boa"
 )
 
-var (
-	// Handler is the API entrypoint
-	Handler = boa.NewHandler(boa.SlackResponser)
-)
+// Handler is the API entrypoint
+func Handler(w http.ResponseWriter, r *http.Request) {
+	boa.NewHandler(boa.SlackResponser)(w, r)
+}
