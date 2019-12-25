@@ -6,6 +6,8 @@ import (
 	"math/rand"
 	"net/http"
 	"time"
+
+	"github.com/cheyilin/boabot/pkg/slack"
 )
 
 func init() {
@@ -24,9 +26,9 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := &SlackSlashCmdResponse{
-		ResponseType: SlackSlashCmdResponseTypeChannel,
-		Text: getAnswer(),
+	resp := &slack.SlashCmdResponse{
+		ResponseType: slack.SlashCmdResponseTypeChannel,
+		Text:         getAnswer(),
 	}
 	jsonBs, err := json.Marshal(resp)
 	if err != nil {
