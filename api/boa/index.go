@@ -3,12 +3,13 @@ package app
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
 	"time"
 
 	"github.com/cheyilin/boabot/pkg/boa"
-	"github.com/cheyilin/boabot/pkg/slack"
+	"github.com/nlopes/slack"
 )
 
 func init() {
@@ -27,7 +28,17 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := slack.NewSlashResponse(boa.GetAnswer())
+	cmd, err := slack.SlashCommandParse(r)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	log.Printf("slashcmd: %+v", cmd)
+
+	resp := &slack.Msg{
+		ResponseType: slack.ResponseTypeInChannel,
+		Text:         boa.GetAnswer(),
+	}
 	jsonBs, err := json.Marshal(resp)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
