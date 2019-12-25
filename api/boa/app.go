@@ -20,16 +20,14 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		status := http.StatusMethodNotAllowed
 		w.WriteHeader(status)
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-		fmt.Fprintf(w, "%d %s", status, http.StatusText(status))
+		fmt.Fprintf(w, "%d %s\n", status, http.StatusText(status))
 		return
 	}
 
-	resp := struct {
-		Answer string `json:"answer"`
-	}{
-		Answer: getAnswer(),
+	resp := &SlackSlashCmdResponse{
+		ResponseType: SlackSlashCmdResponseTypeChannel,
+		Text: getAnswer(),
 	}
-
 	jsonBs, err := json.Marshal(resp)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
