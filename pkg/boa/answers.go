@@ -1,9 +1,13 @@
 package boa
 
-import "math/rand"
+import (
+	"math/rand"
+	"time"
+)
 
 const (
-	defaultAnswer = "順從你的心"
+	defaultQuestion = "(藏在心裡的話)"
+	defaultAnswer   = "順從你的心"
 )
 
 var (
@@ -92,6 +96,10 @@ var (
 		"如果你不討厭，就做吧",
 	}
 )
+
+func init() {
+	rand.Seed(time.Now().Unix())
+}
 
 // GetAnswer returns a random answers
 func GetAnswer() string {
