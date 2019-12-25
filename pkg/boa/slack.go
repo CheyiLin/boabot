@@ -28,9 +28,9 @@ func SlackResponser(r *http.Request) (interface{}, error) {
 
 	sb := &strings.Builder{}
 	if cmd.UserID != "" {
-		fmt.Fprintf(sb, "<@%s> asks: %s", cmd.UserID, cmd.Text)
+		fmt.Fprintf(sb, "<@%s> asks: %s\n", cmd.UserID, cmd.Text)
 	} else {
-		fmt.Fprintf(sb, "Someone asks: %s", cmd.Text)
+		fmt.Fprintf(sb, "Someone asks: %s\n", cmd.Text)
 	}
 	fmt.Fprintf(sb, "God says: %s", GetAnswer())
 
