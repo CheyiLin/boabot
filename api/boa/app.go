@@ -1,16 +1,56 @@
-package app
+package boa
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"net/http"
 	"time"
 )
 
-func Handler(w http.ResponseWriter, r *http.Request) {
+func init() {
 	rand.Seed(time.Now().Unix())
-	fmt.Fprintf(w, "The Answer is: %s", answers[rand.Intn(len(answers))])
 }
+
+func Handler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet, http.MethodPost:
+		// allowed methods
+	default:
+		status := http.StatusMethodNotAllowed
+		w.WriteHeader(status)
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		fmt.Fprintf(w, "%d %s", status, http.StatusText(status))
+		return
+	}
+
+	resp := struct {
+		Answer string `json:"answer"`
+	}{
+		Answer: getAnswer(),
+	}
+
+	jsonBs, err := json.Marshal(resp)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonBs)
+}
+
+func getAnswer() string {
+	answersCount := len(answers)
+	if answersCount == 0 {
+		return defaultAnswer
+	}
+	return answers[rand.Intn(answersCount)]
+}
+
+const (
+	defaultAnswer = "順從你的心"
+)
 
 var (
 	answers = []string{
