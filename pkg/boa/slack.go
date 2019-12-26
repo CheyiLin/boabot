@@ -28,15 +28,27 @@ func SlackResponser(r *http.Request) (interface{}, error) {
 
 	sb := &strings.Builder{}
 	if cmd.UserID != "" {
-		fmt.Fprintf(sb, "<@%s>: %s\n", cmd.UserID, cmd.Text)
-	} else {
-		fmt.Fprintf(sb, "Someone: %s\n", cmd.Text)
+		fmt.Fprintf(sb, "<@%s>\n", cmd.UserID)
 	}
-	fmt.Fprintf(sb, "BoA: %s", GetAnswer())
+	fmt.Fprintf(sb, ">%s\n", cmd.Text)
+	fmt.Fprintf(sb, "*%s*", GetAnswer())
 
 	resp := &slack.Msg{
+		// response in channel
 		ResponseType: slack.ResponseTypeInChannel,
-		Text:         sb.String(),
+		Blocks: slack.Blocks{
+			BlockSet: []slack.Block{
+				// use layout blocks for rich messages
+				// https://api.slack.com/reference/block-kit/blocks
+				slack.SectionBlock{
+					Type: slack.MBTSection,
+					Text: &slack.TextBlockObject{
+						Type: slack.MarkdownType,
+						Text: sb.String(),
+					},
+				},
+			},
+		},
 	}
 	return resp, nil
 }
