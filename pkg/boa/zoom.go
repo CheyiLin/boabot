@@ -69,7 +69,20 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 		},
 	}
 
-	fmt.Println(resp)
+	fmt.Println("cmd.Payload.AccountID:" + cmd.Payload.AccountID)
+	fmt.Println("cmd.Payload.ChannelName:" + cmd.Payload.ChannelName)
+	fmt.Println("cmd.Payload.Cmd:" + cmd.Payload.Cmd)
+	fmt.Println("cmd.Payload.Name:" + cmd.Payload.Name)
+	fmt.Println("cmd.Payload.RobotJID:" + cmd.Payload.RobotJID)
+	fmt.Println("cmd.Payload.ToJID:" + cmd.Payload.ToJID)
+	fmt.Println("cmd.Payload.UserID:" + cmd.Payload.UserID)
+	fmt.Println("cmd.Payload.UserJID:" + cmd.Payload.UserJID)
+	fmt.Println("cmd.Payload.UserName:" + cmd.Payload.UserName)
+
+	fmt.Println("resp.RobotJID" + resp.RobotJID)
+	fmt.Println("resp.ToJID" + resp.ToJID)
+	fmt.Println("resp.AccountID" + resp.AccountID)
+	fmt.Println("resp.Content.Head.Text" + resp.Content.Head.Text)
 
 	return resp, nil
 }
