@@ -2,6 +2,7 @@ package boa
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -67,6 +68,8 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 			},
 		},
 	}
+
+	fmt.Println(resp)
 
 	return resp, nil
 }
