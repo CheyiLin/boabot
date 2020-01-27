@@ -17,7 +17,7 @@ type Payload struct {
 	Cmd         string `json:"cmd,omitempty"`
 	Name        string `json:"name,omitempty"`
 	RobotJID    string `json:"robotJid,omitempty"`
-	Timestamp   string `json:"timestamp,omitempty"`
+	Timestamp   int    `json:"timestamp,omitempty"`
 	ToJID       string `json:"toJid,omitempty"`
 	UserID      string `json:"userId,omitempty"`
 	UserJID     string `json:"userJid,omitempty"`
