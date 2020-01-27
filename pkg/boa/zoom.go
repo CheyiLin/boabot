@@ -1,8 +1,14 @@
 package boa
 
 import (
+	"encoding/json"
 	"net/http"
+	// zoom "github.com/himalayan-institute/zoom-lib-golang"
 )
+
+type Response struct {
+	Message string
+}
 
 // ZoomResponser returns BoA response in Zoom message format
 func ZoomResponser(r *http.Request) (interface{}, error) {
@@ -13,5 +19,12 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 		return nil, Error(http.StatusMethodNotAllowed)
 	}
 
-	return nil, nil
+	resp := &Response{Message: "hello world!"}
+
+	m, err := json.Marshal(resp)
+	if err != nil {
+		return err, nil
+	}
+
+	return m, nil
 }
