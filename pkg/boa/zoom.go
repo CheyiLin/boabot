@@ -49,6 +49,8 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 	}
 
 	cmd, err := ZoomCommandParse(r)
+	return cmd, nil
+
 	if err != nil {
 		return nil, Error(http.StatusBadRequest)
 	}
