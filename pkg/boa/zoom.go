@@ -53,6 +53,8 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 		return nil, Error(http.StatusBadRequest)
 	}
 
+	return cmd.Event, nil
+
 	if cmd.Payload.Cmd == "" {
 		cmd.Payload.Cmd = defaultQuestion
 	}
