@@ -27,20 +27,11 @@ type Payload struct {
 	UserName    string `json:"userName,omitempty"`
 }
 
-// Response - chatbot reponse
 type Response struct {
 	RobotJID  string   `json:"robot_jid,omitempty"`
 	ToJID     string   `json:"to_jid,omitempty"`
 	AccountID string   `json:"account_id,omitempty"`
 	Content   *Content `json:"content,omitempty"`
-}
-
-// AccessTokenResponse - chatbot reponse
-type AccessTokenResponse struct {
-	AccessToken string `json:"access_token,omitempty"`
-	TokenType   string `json:"token_type,omitempty"`
-	ExpiresIn   int    `json:"expires_in,omitempty"`
-	Scope       string `json:"scope,omitempty"`
 }
 
 type Content struct {
@@ -49,6 +40,14 @@ type Content struct {
 
 type Head struct {
 	Text string `json:"text,omitempty"`
+}
+
+// AccessTokenResponse - chatbot reponse
+type AccessTokenResponse struct {
+	AccessToken string `json:"access_token,omitempty"`
+	TokenType   string `json:"token_type,omitempty"`
+	ExpiresIn   int    `json:"expires_in,omitempty"`
+	Scope       string `json:"scope,omitempty"`
 }
 
 // ZoomResponser returns BoA response in Zoom message format
