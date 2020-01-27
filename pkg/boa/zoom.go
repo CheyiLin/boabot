@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"os"
 )
 
 type ZoomCommand struct {
@@ -50,14 +51,8 @@ type Head struct {
 	Text string `json:"text,omitempty"`
 }
 
-// https://marketplace.zoom.us/docs/guides/chatbots/sending-messages
-const (
-	ClientID     = "HqLARBfSzSk6Xq6CKT7Mg"
-	ClientSecret = "1n6wXbV0JJgEyn5lgDgTtBd3L2Cbh6lA"
-	RobotJID     = "v1cig4wtzjqwee4xagwkplaa@xmpp.zoom.us"
-)
-
 // ZoomResponser returns BoA response in Zoom message format
+// https://marketplace.zoom.us/docs/guides/chatbots/sending-messages
 func ZoomResponser(r *http.Request) (interface{}, error) {
 	switch r.Method {
 	case http.MethodGet, http.MethodPost:
@@ -74,7 +69,7 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 	}
 
 	resp := &Response{
-		RobotJID:  RobotJID,
+		RobotJID:  os.Getenv("ROBOT_JID"),
 		ToJID:     cmd.Payload.UserJID,
 		AccountID: cmd.Payload.AccountID,
 		Content: &Content{
@@ -105,7 +100,7 @@ func ZoomCommandParse(r *http.Request) (z ZoomCommand, err error) {
 func getAccessToken() string {
 	url := "https://api.zoom.us/oauth/token?grant_type=client_credentials"
 
-	b := base64.StdEncoding.EncodeToString([]byte(ClientID + ":" + ClientSecret))
+	b := base64.StdEncoding.EncodeToString([]byte(os.Getenv("CLIENT_ID") + ":" + os.Getenv("CLIENT_SECRET")))
 	req, err := http.NewRequest("POST", url, nil)
 	req.Header.Set("authorization", "Basic "+b)
 	req.Header.Set("Content-Type", "application/json")
