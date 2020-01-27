@@ -1,6 +1,7 @@
 package boa
 
 import (
+	"fmt"
 	"net/http"
 )
 
@@ -55,6 +56,8 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 	if cmd.Payload.Cmd == "" {
 		cmd.Payload.Cmd = defaultQuestion
 	}
+
+	fmt.Println(cmd)
 
 	resp := &Response{
 		RobotJID:  cmd.Payload.RobotJID,
