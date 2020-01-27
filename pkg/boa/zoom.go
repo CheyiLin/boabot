@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-// SlackResponser returns BoA response in Slack message format
+// ZoomResponser returns BoA response in Zoom message format
 func ZoomResponser(r *http.Request) (interface{}, error) {
 	switch r.Method {
 	case http.MethodGet, http.MethodPost:
