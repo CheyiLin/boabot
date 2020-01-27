@@ -1,7 +1,6 @@
 package boa
 
 import (
-	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -100,9 +99,10 @@ func ZoomCommandParse(r *http.Request) (z ZoomCommand, err error) {
 func getAccessToken() string {
 	url := "https://api.zoom.us/oauth/token?grant_type=client_credentials"
 	sEnc := base64.StdEncoding.EncodeToString([]byte(ClientID + ":" + ClientSecret))
+	fmt.Println(sEnc)
 
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(sEnc)))
-	req.Header.Set("authorization", sEnc)
+	req, err := http.NewRequest("POST", url, nil)
+	req.Header.Set("authorization", "Basic "+sEnc)
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
