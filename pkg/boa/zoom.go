@@ -26,5 +26,5 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 		return err, nil
 	}
 
-	return m, nil
+	return string(m), nil
 }
