@@ -7,7 +7,7 @@ import (
 )
 
 type Response struct {
-	Message string
+	Message string `json:"message,omitempty"`
 }
 
 // ZoomResponser returns BoA response in Zoom message format
@@ -26,5 +26,5 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 		return err, nil
 	}
 
-	return string(m), nil
+	return m, nil
 }
