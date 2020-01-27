@@ -1,9 +1,9 @@
 package boa
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -65,7 +65,6 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 	}
 
 	accessToken := getAccessToken()
-	fmt.Println(accessToken)
 
 	cmd, err := ZoomCommandParse(r)
 	if err != nil {
@@ -83,7 +82,34 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 		},
 	}
 
+	err = sendMessage(accessToken, resp)
+	if err != nil {
+		return nil, err
+	}
+
 	return resp, nil
+}
+
+func sendMessage(accessToken string, r *Response) error {
+	url := "https://api.zoom.us/v2/im/chat/messages"
+
+	b, err := json.Marshal(r)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
+	req.Header.Set("authorization", "Bearer "+accessToken)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	return nil
 }
 
 // ZoomCommandParse will parse the request of the zoom command
@@ -99,7 +125,6 @@ func ZoomCommandParse(r *http.Request) (z ZoomCommand, err error) {
 func getAccessToken() string {
 	url := "https://api.zoom.us/oauth/token?grant_type=client_credentials"
 	sEnc := base64.StdEncoding.EncodeToString([]byte(ClientID + ":" + ClientSecret))
-	fmt.Println(sEnc)
 
 	req, err := http.NewRequest("POST", url, nil)
 	req.Header.Set("authorization", "Basic "+sEnc)
@@ -113,7 +138,6 @@ func getAccessToken() string {
 	defer resp.Body.Close()
 
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println("response Body:", string(body))
 
 	var accessTokenResponse AccessTokenResponse
 
