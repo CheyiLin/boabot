@@ -81,7 +81,7 @@ func ZoomCommandParse(r *http.Request) (z ZoomCommand, err error) {
 		return z, err
 	}
 
-	if err = json.NewDecoder(r.Body).Decode(z); err != nil {
+	if err = json.NewDecoder(r.Body).Decode(&z); err != nil {
 		return z, err
 	}
 
