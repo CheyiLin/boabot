@@ -2,9 +2,9 @@ package boa
 
 import (
 	"net/http"
-	// zoom "github.com/himalayan-institute/zoom-lib-golang"
 )
 
+// Response - chatbot reponse
 type Response struct {
 	Message string `json:"message,omitempty"`
 }
@@ -18,7 +18,7 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 		return nil, Error(http.StatusMethodNotAllowed)
 	}
 
-	resp := &Response{Message: "hello world!"}
+	resp := &Response{Message: GetAnswer()}
 
 	return resp, nil
 }
