@@ -48,7 +48,11 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 		return nil, Error(http.StatusMethodNotAllowed)
 	}
 
+	_ = r.ParseForm()
+	return r.PostForm, nil
+
 	cmd, err := ZoomCommandParse(r)
+
 	if err != nil {
 		return nil, Error(http.StatusBadRequest)
 	}
