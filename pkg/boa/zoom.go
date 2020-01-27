@@ -2,7 +2,6 @@ package boa
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
@@ -58,11 +57,9 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 		cmd.Payload.Cmd = defaultQuestion
 	}
 
-	fmt.Println(cmd)
-
 	resp := &Response{
-		RobotJID:  cmd.Payload.RobotJID,
-		ToJID:     cmd.Payload.ToJID,
+		RobotJID:  "v1cig4wtzjqwee4xagwkplaa@xmpp.zoom.us",
+		ToJID:     cmd.Payload.UserJID,
 		AccountID: cmd.Payload.AccountID,
 		Content: &Content{
 			Head: &Head{
