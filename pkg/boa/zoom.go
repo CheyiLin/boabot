@@ -81,11 +81,7 @@ func ZoomCommandParse(r *http.Request) (z ZoomCommand, err error) {
 		return z, err
 	}
 
-	z.Event = r.PostForm.Get("event")
-
-	rawPayload := r.PostForm.Get("payload")
-
-	if err = json.Unmarshal([]byte(rawPayload), z.Payload); err != nil {
+	if err = json.NewDecoder(r.Body).Decode(z); err != nil {
 		return z, err
 	}
 
