@@ -1,8 +1,10 @@
 package boa
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -32,6 +34,14 @@ type Response struct {
 	Content   *Content `json:"content,omitempty"`
 }
 
+// AccessTokenResponse - chatbot reponse
+type AccessTokenResponse struct {
+	AccessToken string `json:"access_token,omitempty"`
+	TokenType   string `json:"token_type,omitempty"`
+	ExpiresIn   int    `json:"expires_in,omitempty"`
+	Scope       string `json:"scope,omitempty"`
+}
+
 type Content struct {
 	Head *Head `json:"head,omitempty"`
 }
@@ -39,6 +49,11 @@ type Content struct {
 type Head struct {
 	Text string `json:"text,omitempty"`
 }
+
+const (
+	ClientID     = "HqLARBfSzSk6Xq6CKT7Mg"
+	ClientSecret = "1n6wXbV0JJgEyn5lgDgTtBd3L2Cbh6lA"
+)
 
 // ZoomResponser returns BoA response in Zoom message format
 func ZoomResponser(r *http.Request) (interface{}, error) {
@@ -49,13 +64,12 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 		return nil, Error(http.StatusMethodNotAllowed)
 	}
 
+	accessToken := getAccessToken()
+	fmt.Println(accessToken)
+
 	cmd, err := ZoomCommandParse(r)
 	if err != nil {
 		return nil, Error(http.StatusBadRequest)
-	}
-
-	if cmd.Payload.Cmd == "" {
-		cmd.Payload.Cmd = defaultQuestion
 	}
 
 	resp := &Response{
@@ -69,21 +83,6 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 		},
 	}
 
-	fmt.Println("cmd.Payload.AccountID:" + cmd.Payload.AccountID)
-	fmt.Println("cmd.Payload.ChannelName:" + cmd.Payload.ChannelName)
-	fmt.Println("cmd.Payload.Cmd:" + cmd.Payload.Cmd)
-	fmt.Println("cmd.Payload.Name:" + cmd.Payload.Name)
-	fmt.Println("cmd.Payload.RobotJID:" + cmd.Payload.RobotJID)
-	fmt.Println("cmd.Payload.ToJID:" + cmd.Payload.ToJID)
-	fmt.Println("cmd.Payload.UserID:" + cmd.Payload.UserID)
-	fmt.Println("cmd.Payload.UserJID:" + cmd.Payload.UserJID)
-	fmt.Println("cmd.Payload.UserName:" + cmd.Payload.UserName)
-
-	fmt.Println("resp.RobotJID" + resp.RobotJID)
-	fmt.Println("resp.ToJID" + resp.ToJID)
-	fmt.Println("resp.AccountID" + resp.AccountID)
-	fmt.Println("resp.Content.Head.Text" + resp.Content.Head.Text)
-
 	return resp, nil
 }
 
@@ -95,4 +94,29 @@ func ZoomCommandParse(r *http.Request) (z ZoomCommand, err error) {
 	}
 
 	return z, nil
+}
+
+func getAccessToken() string {
+	url := "https://api.zoom.us/oauth/token?grant_type=client_credentials"
+	sEnc := base64.StdEncoding.EncodeToString([]byte(ClientID + ":" + ClientSecret))
+
+	req, err := http.NewRequest("POST", url, nil)
+	req.Header.Set("authorization", sEnc)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println("response Body:", string(body))
+
+	var accessTokenResponse AccessTokenResponse
+
+	json.Unmarshal(body, &accessTokenResponse)
+
+	return accessTokenResponse.AccessToken
 }
