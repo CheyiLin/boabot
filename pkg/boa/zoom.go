@@ -1,6 +1,7 @@
 package boa
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -48,11 +49,7 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 		return nil, Error(http.StatusMethodNotAllowed)
 	}
 
-	return "test", nil
-
 	cmd, err := ZoomCommandParse(r)
-	return cmd, nil
-
 	if err != nil {
 		return nil, Error(http.StatusBadRequest)
 	}
@@ -84,15 +81,12 @@ func ZoomCommandParse(r *http.Request) (z ZoomCommand, err error) {
 	}
 
 	z.Event = r.PostForm.Get("event")
-	z.Payload.AccountID = r.PostForm.Get("accountId")
-	z.Payload.ChannelName = r.PostForm.Get("channelName")
-	z.Payload.Cmd = r.PostForm.Get("cmd")
-	z.Payload.Name = r.PostForm.Get("name")
-	z.Payload.RobotJID = r.PostForm.Get("robotJid")
-	z.Payload.Timestamp = r.PostForm.Get("timestamp")
-	z.Payload.ToJID = r.PostForm.Get("toJid")
-	z.Payload.UserID = r.PostForm.Get("userId")
-	z.Payload.UserJID = r.PostForm.Get("userJid")
-	z.Payload.UserName = r.PostForm.Get("userName")
+
+	rawPayload := r.PostForm.Get("payload")
+
+	if err = json.Unmarshal([]byte(rawPayload), z.Payload); err != nil {
+		return z, err
+	}
+
 	return z, nil
 }
