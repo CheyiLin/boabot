@@ -51,7 +51,8 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 
 	cmd, err := ZoomCommandParse(r)
 	if err != nil {
-		return nil, Error(http.StatusBadRequest)
+		return nil, err
+		// return nil, Error(http.StatusBadRequest)
 	}
 
 	if cmd.Payload.Cmd == "" {
