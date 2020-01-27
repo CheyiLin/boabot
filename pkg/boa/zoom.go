@@ -50,9 +50,11 @@ type Head struct {
 	Text string `json:"text,omitempty"`
 }
 
+// https://marketplace.zoom.us/docs/guides/chatbots/sending-messages
 const (
 	ClientID     = "HqLARBfSzSk6Xq6CKT7Mg"
 	ClientSecret = "1n6wXbV0JJgEyn5lgDgTtBd3L2Cbh6lA"
+	RobotJID     = "v1cig4wtzjqwee4xagwkplaa@xmpp.zoom.us"
 )
 
 // ZoomResponser returns BoA response in Zoom message format
@@ -72,7 +74,7 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 	}
 
 	resp := &Response{
-		RobotJID:  "v1cig4wtzjqwee4xagwkplaa@xmpp.zoom.us",
+		RobotJID:  RobotJID,
 		ToJID:     cmd.Payload.UserJID,
 		AccountID: cmd.Payload.AccountID,
 		Content: &Content{
@@ -84,39 +86,17 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 
 	err = sendMessage(accessToken, resp)
 	if err != nil {
-		return nil, err
+		return nil, Error(http.StatusInternalServerError)
 	}
 
 	return resp, nil
-}
-
-func sendMessage(accessToken string, r *Response) error {
-	url := "https://api.zoom.us/v2/im/chat/messages"
-
-	b, err := json.Marshal(r)
-	if err != nil {
-		return err
-	}
-
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
-	req.Header.Set("authorization", "Bearer "+accessToken)
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-
-	return nil
 }
 
 // ZoomCommandParse will parse the request of the zoom command
 func ZoomCommandParse(r *http.Request) (z ZoomCommand, err error) {
 	decoder := json.NewDecoder(r.Body)
 	if err = decoder.Decode(&z); err != nil {
-		panic(err)
+		return z, err
 	}
 
 	return z, nil
@@ -124,10 +104,10 @@ func ZoomCommandParse(r *http.Request) (z ZoomCommand, err error) {
 
 func getAccessToken() string {
 	url := "https://api.zoom.us/oauth/token?grant_type=client_credentials"
-	sEnc := base64.StdEncoding.EncodeToString([]byte(ClientID + ":" + ClientSecret))
 
+	b := base64.StdEncoding.EncodeToString([]byte(ClientID + ":" + ClientSecret))
 	req, err := http.NewRequest("POST", url, nil)
-	req.Header.Set("authorization", "Basic "+sEnc)
+	req.Header.Set("authorization", "Basic "+b)
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -140,8 +120,28 @@ func getAccessToken() string {
 	body, _ := ioutil.ReadAll(resp.Body)
 
 	var accessTokenResponse AccessTokenResponse
-
 	json.Unmarshal(body, &accessTokenResponse)
 
 	return accessTokenResponse.AccessToken
+}
+
+func sendMessage(accessToken string, r *Response) error {
+	url := "https://api.zoom.us/v2/im/chat/messages"
+
+	b, err := json.Marshal(r)
+	if err != nil {
+		return err
+	}
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
+	req.Header.Set("authorization", "Bearer "+accessToken)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	return nil
 }
