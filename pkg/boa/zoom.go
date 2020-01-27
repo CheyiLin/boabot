@@ -3,6 +3,7 @@ package boa
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -77,11 +78,9 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 
 // ZoomCommandParse will parse the request of the zoom command
 func ZoomCommandParse(r *http.Request) (z ZoomCommand, err error) {
-	if err = r.ParseForm(); err != nil {
-		return z, err
-	}
+	bodyBytes, err := ioutil.ReadAll(r.Body)
 
-	if err = json.NewDecoder(r.Body).Decode(&z); err != nil {
+	if err = json.Unmarshal(bodyBytes, &z); err != nil {
 		return z, err
 	}
 
