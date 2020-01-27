@@ -1,9 +1,7 @@
 package boa
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -52,8 +50,7 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 
 	cmd, err := ZoomCommandParse(r)
 	if err != nil {
-		return nil, err
-		// return nil, Error(http.StatusBadRequest)
+		return nil, Error(http.StatusBadRequest)
 	}
 
 	if cmd.Payload.Cmd == "" {
@@ -78,11 +75,22 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 
 // ZoomCommandParse will parse the request of the zoom command
 func ZoomCommandParse(r *http.Request) (z ZoomCommand, err error) {
-	bodyBytes, err := ioutil.ReadAll(r.Body)
-
-	if err = json.Unmarshal(bodyBytes, &z); err != nil {
+	if err = r.ParseForm(); err != nil {
 		return z, err
 	}
+
+	z.Event = r.PostForm.Get("event")
+
+	// z.Payload.AccountID = r.PostForm.Get("accountId")
+	// z.Payload.ChannelName = r.PostForm.Get("channelName")
+	// z.Payload.Cmd = r.PostForm.Get("cmd")
+	// z.Payload.Name = r.PostForm.Get("name")
+	// z.Payload.RobotJID = r.PostForm.Get("robotJid")
+	// z.Payload.Timestamp = r.PostForm.Get("timestamp")
+	// z.Payload.ToJID = r.PostForm.Get("toJid")
+	// z.Payload.UserID = r.PostForm.Get("userId")
+	// z.Payload.UserJID = r.PostForm.Get("userJid")
+	// z.Payload.UserName = r.PostForm.Get("userName")
 
 	return z, nil
 }
