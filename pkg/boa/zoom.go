@@ -1,13 +1,15 @@
 package boa
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 )
 
 type ZoomCommand struct {
-	Event   string   `json:"event,omitempty"`
-	Payload *Payload `json:"payload,omitempty"`
+	Event   string  `json:"event,omitempty"`
+	Payload Payload `json:"payload,omitempty"`
 }
 
 type Payload struct {
@@ -48,16 +50,10 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 		return nil, Error(http.StatusMethodNotAllowed)
 	}
 
-	_ = r.ParseForm()
-	return r.PostForm, nil
-
 	cmd, err := ZoomCommandParse(r)
-
 	if err != nil {
 		return nil, Error(http.StatusBadRequest)
 	}
-
-	return cmd.Event, nil
 
 	if cmd.Payload.Cmd == "" {
 		cmd.Payload.Cmd = defaultQuestion
@@ -81,22 +77,10 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 
 // ZoomCommandParse will parse the request of the zoom command
 func ZoomCommandParse(r *http.Request) (z ZoomCommand, err error) {
-	if err = r.ParseForm(); err != nil {
-		return z, err
+	decoder := json.NewDecoder(r.Body)
+	if err = decoder.Decode(&z); err != nil {
+		panic(err)
 	}
-
-	z.Event = r.PostForm.Get("event")
-
-	// z.Payload.AccountID = r.PostForm.Get("accountId")
-	// z.Payload.ChannelName = r.PostForm.Get("channelName")
-	// z.Payload.Cmd = r.PostForm.Get("cmd")
-	// z.Payload.Name = r.PostForm.Get("name")
-	// z.Payload.RobotJID = r.PostForm.Get("robotJid")
-	// z.Payload.Timestamp = r.PostForm.Get("timestamp")
-	// z.Payload.ToJID = r.PostForm.Get("toJid")
-	// z.Payload.UserID = r.PostForm.Get("userId")
-	// z.Payload.UserJID = r.PostForm.Get("userJid")
-	// z.Payload.UserName = r.PostForm.Get("userName")
 
 	return z, nil
 }
