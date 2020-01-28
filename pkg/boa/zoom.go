@@ -67,7 +67,7 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 	}
 
 	resp := &Response{
-		RobotJID:  conf.ClientSecret,
+		RobotJID:  conf.RobotJID,
 		ToJID:     cmd.Payload.UserJID,
 		AccountID: cmd.Payload.AccountID,
 		Content: &Content{
