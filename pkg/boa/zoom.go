@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"os"
 )
 
 type ZoomCommand struct {
@@ -68,7 +67,7 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 	}
 
 	resp := &Response{
-		RobotJID:  os.Getenv("ROBOT_JID"),
+		RobotJID:  conf.ClientSecret,
 		ToJID:     cmd.Payload.UserJID,
 		AccountID: cmd.Payload.AccountID,
 		Content: &Content{
@@ -99,7 +98,7 @@ func ZoomCommandParse(r *http.Request) (z ZoomCommand, err error) {
 func getAccessToken() string {
 	url := "https://api.zoom.us/oauth/token?grant_type=client_credentials"
 
-	b := base64.StdEncoding.EncodeToString([]byte(os.Getenv("CLIENT_ID") + ":" + os.Getenv("CLIENT_SECRET")))
+	b := base64.StdEncoding.EncodeToString([]byte(conf.ClientID + ":" + conf.ClientSecret))
 	req, err := http.NewRequest("POST", url, nil)
 	req.Header.Set("authorization", "Basic "+b)
 	req.Header.Set("Content-Type", "application/json")
