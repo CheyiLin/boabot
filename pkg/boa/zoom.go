@@ -82,10 +82,6 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 		},
 	}
 
-	// debug
-	fmt.Println(resp)
-	//
-
 	err = sendMessage(accessToken, resp)
 	if err != nil {
 		return nil, Error(http.StatusInternalServerError)
@@ -119,19 +115,12 @@ func getAccessToken() (string, error) {
 		fmt.Printf("[Error] Get access token: %v", err)
 		return "", err
 	}
+	defer resp.Body.Close()
 
 	body, _ := ioutil.ReadAll(resp.Body)
 
-	// debug
-	fmt.Println(body)
-	//
-
 	var accessTokenResponse AccessTokenResponse
 	json.Unmarshal(body, &accessTokenResponse)
-
-	// debug
-	fmt.Println(accessTokenResponse.AccessToken)
-	//
 
 	return accessTokenResponse.AccessToken, nil
 }
@@ -149,11 +138,12 @@ func sendMessage(accessToken string, r *Response) error {
 	m["authorization"] = "Bearer " + accessToken
 	m["Content-Type"] = "application/json"
 
-	_, err = httpPostRequest(url, bytes.NewBuffer(j), m)
+	resp, err := httpPostRequest(url, bytes.NewBuffer(j), m)
 	if err != nil {
 		fmt.Printf("[Error] Send message: %v", err)
 		return err
 	}
+	defer resp.Body.Close()
 
 	return nil
 }
@@ -173,7 +163,6 @@ func httpPostRequest(url string, body io.Reader, headers map[string]string) (*ht
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
 
 	return resp, nil
 }
