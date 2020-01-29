@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 )
@@ -101,6 +100,7 @@ func ZoomCommandParse(r *http.Request) (z ZoomCommand, err error) {
 	return z, nil
 }
 
+// get access token for sendMessage API calls authentication
 func getAccessToken() (string, error) {
 	url := "https://api.zoom.us/oauth/token?grant_type=client_credentials"
 
@@ -125,6 +125,7 @@ func getAccessToken() (string, error) {
 	return accessTokenResponse.AccessToken, nil
 }
 
+// Use API calls to send message from chatbot to user
 func sendMessage(accessToken string, r *Response) error {
 	url := "https://api.zoom.us/v2/im/chat/messages"
 
@@ -146,23 +147,4 @@ func sendMessage(accessToken string, r *Response) error {
 	defer resp.Body.Close()
 
 	return nil
-}
-
-func httpPostRequest(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
-	req, err := http.NewRequest("POST", url, body)
-	if err != nil {
-		return nil, err
-	}
-
-	for k, v := range headers {
-		req.Header.Set(k, v)
-	}
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
 }
