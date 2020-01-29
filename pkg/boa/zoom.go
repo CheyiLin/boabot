@@ -120,6 +120,14 @@ func getAccessToken() (string, error) {
 		return "", err
 	}
 
+	// debug
+	fmt.Printf("Error: %v", err)
+	//
+
+	// debug
+	fmt.Println(resp)
+	//
+
 	body, _ := ioutil.ReadAll(resp.Body)
 
 	var accessTokenResponse AccessTokenResponse
