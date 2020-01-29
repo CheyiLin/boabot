@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -59,11 +60,14 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 		return nil, Error(http.StatusMethodNotAllowed)
 	}
 
-	accessToken := getAccessToken()
+	accessToken, err := getAccessToken()
+	if err != nil {
+		return nil, Error(http.StatusInternalServerError)
+	}
 
 	cmd, err := ZoomCommandParse(r)
 	if err != nil {
-		return nil, Error(http.StatusBadRequest)
+		return nil, Error(http.StatusInternalServerError)
 	}
 
 	resp := &Response{
@@ -89,52 +93,71 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 func ZoomCommandParse(r *http.Request) (z ZoomCommand, err error) {
 	decoder := json.NewDecoder(r.Body)
 	if err = decoder.Decode(&z); err != nil {
+		fmt.Printf("[Error] Parse zoom commad decoder: %v", err)
 		return z, err
 	}
 
 	return z, nil
 }
 
-func getAccessToken() string {
+func getAccessToken() (string, error) {
 	url := "https://api.zoom.us/oauth/token?grant_type=client_credentials"
 
 	b := base64.StdEncoding.EncodeToString([]byte(conf.ClientID + ":" + conf.ClientSecret))
-	req, err := http.NewRequest("POST", url, nil)
-	req.Header.Set("authorization", "Basic "+b)
-	req.Header.Set("Content-Type", "application/json")
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	m := make(map[string]string)
+	m["authorization"] = "Basic " + b
+	m["Content-Type"] = "application/json"
+
+	resp, err := httpPostRequest(url, nil, m)
 	if err != nil {
-		panic(err)
+		fmt.Printf("[Error] Get access token: %v", err)
+		return "", err
 	}
-	defer resp.Body.Close()
 
 	body, _ := ioutil.ReadAll(resp.Body)
 
 	var accessTokenResponse AccessTokenResponse
 	json.Unmarshal(body, &accessTokenResponse)
 
-	return accessTokenResponse.AccessToken
+	return accessTokenResponse.AccessToken, nil
 }
 
 func sendMessage(accessToken string, r *Response) error {
 	url := "https://api.zoom.us/v2/im/chat/messages"
 
-	b, err := json.Marshal(r)
+	j, err := json.Marshal(r)
 	if err != nil {
+		fmt.Printf("[Error] Send message json marshal: %v", err)
 		return err
 	}
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
-	req.Header.Set("authorization", "Bearer "+accessToken)
-	req.Header.Set("Content-Type", "application/json")
+
+	m := make(map[string]string)
+	m["authorization"] = "Bearer " + accessToken
+	m["Content-Type"] = "application/json"
+
+	_, err = httpPostRequest(url, bytes.NewBuffer(j), m)
+	if err != nil {
+		fmt.Printf("[Error] Send message: %v", err)
+		return err
+	}
+
+	return nil
+}
+
+func httpPostRequest(url string, buffer *bytes.Buffer, headers map[string]string) (*http.Response, error) {
+	req, err := http.NewRequest("POST", url, buffer)
+
+	for k, v := range headers {
+		req.Header.Set(k, v)
+	}
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 
-	return nil
+	return resp, nil
 }
