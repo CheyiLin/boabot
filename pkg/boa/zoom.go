@@ -82,6 +82,10 @@ func ZoomResponser(r *http.Request) (interface{}, error) {
 		},
 	}
 
+	// debug
+	fmt.Println(resp)
+	//
+
 	err = sendMessage(accessToken, resp)
 	if err != nil {
 		return nil, Error(http.StatusInternalServerError)
@@ -120,6 +124,10 @@ func getAccessToken() (string, error) {
 
 	var accessTokenResponse AccessTokenResponse
 	json.Unmarshal(body, &accessTokenResponse)
+
+	// debug
+	fmt.Println(accessTokenResponse.AccessToken)
+	//
 
 	return accessTokenResponse.AccessToken, nil
 }
