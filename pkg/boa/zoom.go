@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 )
@@ -145,8 +146,11 @@ func sendMessage(accessToken string, r *Response) error {
 	return nil
 }
 
-func httpPostRequest(url string, buffer *bytes.Buffer, headers map[string]string) (*http.Response, error) {
-	req, err := http.NewRequest("POST", url, buffer)
+func httpPostRequest(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
+	req, err := http.NewRequest("POST", url, body)
+	if err != nil {
+		return nil, err
+	}
 
 	for k, v := range headers {
 		req.Header.Set(k, v)
