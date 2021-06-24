@@ -1,4 +1,4 @@
-package boa
+package app
 
 import (
 	"os"

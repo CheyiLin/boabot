@@ -1,11 +1,11 @@
-package boa
+package utils
 
 import (
 	"io"
 	"net/http"
 )
 
-func httpPostRequest(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
+func HttpPostRequest(url string, body io.Reader, headers map[string]string) (*http.Response, error) {
 	req, err := http.NewRequest("POST", url, body)
 	if err != nil {
 		return nil, err

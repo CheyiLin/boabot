@@ -1,4 +1,4 @@
-package boa
+package app
 
 import (
 	"bytes"
@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/cheyilin/boabot/pkg/utils"
 )
 
 type ZoomCommand struct {
@@ -50,47 +52,8 @@ type AccessTokenResponse struct {
 	Scope       string `json:"scope,omitempty"`
 }
 
-// ZoomResponser returns BoA response in Zoom message format
-// https://marketplace.zoom.us/docs/guides/chatbots/sending-messages
-func ZoomResponser(r *http.Request) (interface{}, error) {
-	switch r.Method {
-	case http.MethodGet, http.MethodPost:
-		// allowed methods
-	default:
-		return nil, Error(http.StatusMethodNotAllowed)
-	}
-
-	accessToken, err := getAccessToken()
-	if err != nil {
-		return nil, Error(http.StatusInternalServerError)
-	}
-
-	cmd, err := ZoomCommandParse(r)
-	if err != nil {
-		return nil, Error(http.StatusInternalServerError)
-	}
-
-	resp := &Response{
-		RobotJID:  conf.RobotJID,
-		ToJID:     cmd.Payload.UserJID,
-		AccountID: cmd.Payload.AccountID,
-		Content: &Content{
-			Head: &Head{
-				Text: GetAnswer(),
-			},
-		},
-	}
-
-	err = sendMessage(accessToken, resp)
-	if err != nil {
-		return nil, Error(http.StatusInternalServerError)
-	}
-
-	return resp, nil
-}
-
-// ZoomCommandParse will parse the request of the zoom command
-func ZoomCommandParse(r *http.Request) (z ZoomCommand, err error) {
+// parseCommand will parse the request of the zoom command
+func parseCommand(r *http.Request) (z ZoomCommand, err error) {
 	decoder := json.NewDecoder(r.Body)
 	if err = decoder.Decode(&z); err != nil {
 		fmt.Printf("[Error] Parse zoom commad decoder: %v", err)
@@ -110,7 +73,7 @@ func getAccessToken() (string, error) {
 	m["authorization"] = "Basic " + b
 	m["Content-Type"] = "application/json"
 
-	resp, err := httpPostRequest(url, nil, m)
+	resp, err := utils.HttpPostRequest(url, nil, m)
 	if err != nil {
 		fmt.Printf("[Error] Get access token: %v", err)
 		return "", err
@@ -139,7 +102,7 @@ func sendMessage(accessToken string, r *Response) error {
 	m["authorization"] = "Bearer " + accessToken
 	m["Content-Type"] = "application/json"
 
-	resp, err := httpPostRequest(url, bytes.NewBuffer(j), m)
+	resp, err := utils.HttpPostRequest(url, bytes.NewBuffer(j), m)
 	if err != nil {
 		fmt.Printf("[Error] Send message: %v", err)
 		return err

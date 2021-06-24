@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	defaultQuestion = "(謎之音)"
-	defaultAnswer   = "順從你的心"
+	DefaultQuestion = "(謎之音)"
+	DefaultAnswer   = "順從你的心"
 )
 
 var (
@@ -105,7 +105,7 @@ func init() {
 func GetAnswer() string {
 	answersCount := len(answers)
 	if answersCount == 0 {
-		return defaultAnswer
+		return DefaultAnswer
 	}
 	return answers[rand.Intn(answersCount)]
 }
