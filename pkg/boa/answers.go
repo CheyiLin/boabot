@@ -1,18 +1,8 @@
 package boa
 
-import (
-	"math/rand"
-	"time"
-)
-
-const (
-	DefaultQuestion = "(謎之音)"
-	DefaultAnswer   = "順從你的心"
-)
-
 var (
+	// original answers
 	answers = []string{
-		// original answers
 		"為做最好的決定，保持冷靜",
 		"別忘了生活還有樂趣",
 		"轉移你的注意力",
@@ -69,43 +59,5 @@ var (
 		"最好等一等",
 		"這不明智",
 		"要謹慎",
-		// extended answers
-		"你冷靜",
-		"在有跟沒有之間",
-		"尋求援助吧",
-		"不要指望 TA",
-		"魔鬼藏在細節裡",
-		"BJ4",
-		"就做吧",
-		"毋湯",
-		"大膽一點吧",
-		"你就等",
-		"放眼世界，征服宇宙",
-		"可以問你媽",
-		"有 87% 可能性",
-		"謀恩丟",
-		"如果你能一個禮拜不喝飲料的話",
-		"可以去問石頭",
-		"結果可能還不錯",
-		"了不起，負責",
-		"你想幹嘛就幹嘛",
-		"拖延一下沒關係",
-		"可能會發生令人吃驚的事",
-		"答案就在你身後",
-		"這種小事可以不用問",
-		"如果你不討厭，就做吧",
 	}
 )
-
-func init() {
-	rand.Seed(time.Now().Unix())
-}
-
-// GetAnswer returns a random answers
-func GetAnswer() string {
-	answersCount := len(answers)
-	if answersCount == 0 {
-		return DefaultAnswer
-	}
-	return answers[rand.Intn(answersCount)]
-}

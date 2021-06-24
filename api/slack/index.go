@@ -5,13 +5,14 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/cheyilin/boabot/pkg/boa"
+	"github.com/cheyilin/boabot/pkg/api"
+	"github.com/cheyilin/boabot/pkg/boa/aimba"
 	"github.com/nlopes/slack"
 )
 
 // Handler is the API entrypoint
 func Handler(w http.ResponseWriter, r *http.Request) {
-	boa.NewHandler(SlackResponser)(w, r)
+	api.NewHandler(SlackResponser)(w, r)
 }
 
 // SlackResponser returns BoA response in Slack message format
@@ -20,16 +21,16 @@ func SlackResponser(r *http.Request) (interface{}, error) {
 	case http.MethodGet, http.MethodPost:
 		// allowed methods
 	default:
-		return nil, boa.Error(http.StatusMethodNotAllowed)
+		return nil, api.Error(http.StatusMethodNotAllowed)
 	}
 
 	cmd, err := slack.SlashCommandParse(r)
 	if err != nil {
-		return nil, boa.Error(http.StatusBadRequest)
+		return nil, api.Error(http.StatusBadRequest)
 	}
 
 	if cmd.Text == "" {
-		cmd.Text = boa.DefaultQuestion
+		cmd.Text = aimba.Boa.DefaultQuestion()
 	}
 
 	sb := &strings.Builder{}
@@ -37,7 +38,7 @@ func SlackResponser(r *http.Request) (interface{}, error) {
 		fmt.Fprintf(sb, "<@%s>\n", cmd.UserID)
 	}
 	fmt.Fprintf(sb, ">%s\n", cmd.Text)
-	fmt.Fprintf(sb, "*%s*", boa.GetAnswer())
+	fmt.Fprintf(sb, "*%s*", aimba.Boa.GetAnswer())
 
 	resp := &slack.Msg{
 		// response in channel

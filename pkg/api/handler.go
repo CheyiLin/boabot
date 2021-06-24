@@ -1,4 +1,4 @@
-package boa
+package api
 
 import (
 	"encoding/json"
