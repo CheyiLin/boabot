@@ -52,8 +52,8 @@ type AccessTokenResponse struct {
 	Scope       string `json:"scope,omitempty"`
 }
 
-// ParseCommand will parse the request of the zoom command
-func ParseCommand(r *http.Request) (z ZoomCommand, err error) {
+// parseCommand will parse the request of the zoom command
+func parseCommand(r *http.Request) (z ZoomCommand, err error) {
 	decoder := json.NewDecoder(r.Body)
 	if err = decoder.Decode(&z); err != nil {
 		fmt.Printf("[Error] Parse zoom commad decoder: %v", err)
@@ -63,10 +63,10 @@ func ParseCommand(r *http.Request) (z ZoomCommand, err error) {
 	return z, nil
 }
 
-// GetAccessToken returns access token for SendMessage API calls authentication
-func GetAccessToken() (string, error) {
+// getAccessToken returns access token for SendMessage API calls authentication
+func getAccessToken() (string, error) {
 	url := "https://api.zoom.us/oauth/token?grant_type=client_credentials"
-	b := base64.StdEncoding.EncodeToString([]byte(Conf.ClientID + ":" + Conf.ClientSecret))
+	b := base64.StdEncoding.EncodeToString([]byte(conf.ClientID + ":" + conf.ClientSecret))
 
 	m := make(map[string]string)
 	m["authorization"] = "Basic " + b
@@ -87,8 +87,8 @@ func GetAccessToken() (string, error) {
 	return accessTokenResponse.AccessToken, nil
 }
 
-// SendMessage uses API calls to send message from chatbot to user
-func SendMessage(accessToken string, r *Response) error {
+// sendMessage uses API calls to send message from chatbot to user
+func sendMessage(accessToken string, r *Response) error {
 	url := "https://api.zoom.us/v2/im/chat/messages"
 
 	j, err := json.Marshal(r)

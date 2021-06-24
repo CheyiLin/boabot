@@ -14,6 +14,10 @@ const (
 	defaultAnswer   = "順從你的心"
 )
 
+var (
+	Boa = DefaultBoa("default")
+)
+
 type DefaultBoa string
 
 func (s DefaultBoa) GetAnswer() string {
